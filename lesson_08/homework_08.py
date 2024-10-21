@@ -3,7 +3,6 @@ def calculate_sum(string):
     try:
         num_list = [int(num) for num in string.split(',')]
         return sum(num_list)
-        numbers = [num for num in numbers]
     except ValueError:
         return "Не можу це зробити"
 
