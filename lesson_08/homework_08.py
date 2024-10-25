@@ -1,4 +1,5 @@
 numbers = ["1,2,3,4", "1,2,3,4,50", "qwerty1,2,3"]
+
 def calculate_sum(string):
     try:
         num_list = [int(num) for num in string.split(',')]
