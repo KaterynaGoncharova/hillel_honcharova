@@ -35,3 +35,4 @@ def log_event(username: str, status: str):
         logger.warning(log_message)
     else:
         logger.error(log_message)
+
