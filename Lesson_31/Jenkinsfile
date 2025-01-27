@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REQUIREMENTS_PATH = '/Users/katerynagoncharova/Hillel_course/pythonProject/hillel_honcharova/Lesson_31/requirements.txt'
+        REQUIREMENTS_PATH = 'Lesson_31/requirements.txt'
     }
 
     stages {
