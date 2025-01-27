@@ -2,21 +2,20 @@ pipeline {
     agent any
 
     environment {
-        // Встановіть шлях до вашого Python середовища або використовуйте системний Python
-        PYTHON_HOME = '/path/to/your/python'
-    }
+
+        PYTHON_HOME = '/path/to/your/python/Users/katerynagoncharova/Hillel_course/pythonProject/hillel_honcharova/Lesson_31/Hillel_project.py
 
     stages {
         stage('Checkout') {
             steps {
-                // Вилучення коду з репозиторію
+
                 checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Встановлення залежностей
+
                 script {
                     sh '''
                         ${PYTHON_HOME}/bin/pip install -r requirements.txt
@@ -27,7 +26,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                // Запуск автотестів
+
                 script {
                     sh '''
                         ${PYTHON_HOME}/bin/python -m unittest discover
@@ -38,7 +37,7 @@ pipeline {
 
         stage('Publish Test Results') {
             steps {
-                // Публікація результатів тестування у Jenkins
+
                 junit '**/test-*.xml'
             }
         }
