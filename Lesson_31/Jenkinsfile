@@ -2,56 +2,54 @@ pipeline {
     agent any
 
     environment {
-
-        PYTHON_HOME = '/path/to/your/python/Users/katerynagoncharova/Hillel_course/pythonProject/hillel_honcharova/Lesson_31/Hillel_project.py
+        // Встановлюємо шлях до файлу requirements.txt
+        REQUIREMENTS_PATH = 'Lesson_31/requirements.txt'
+    }
 
     stages {
         stage('Checkout') {
             steps {
-
-                checkout scm
+                // Крок для вилучення коду з репозиторію
+                git 'https://github.com/KaterynaGoncharova/hillel_honcharova'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Set up Python environment') {
             steps {
-
                 script {
-                    sh '''
-                        ${PYTHON_HOME}/bin/pip install -r requirements.txt
-                    '''
+                    // Створення віртуального середовища
+                    sh 'python3 -m venv venv'
+                    // Встановлення залежностей з файлу requirements.txt
+                    sh './venv/bin/pip install -r ${REQUIREMENTS_PATH}'
                 }
             }
         }
 
-        stage('Run Tests') {
+        stage('Run tests') {
             steps {
-
                 script {
-                    sh '''
-                        ${PYTHON_HOME}/bin/python -m unittest discover
-                    '''
+                    // Запуск автотестів
+                    sh './venv/bin/pytest'
                 }
             }
         }
 
-        stage('Publish Test Results') {
+        stage('Publish test results') {
             steps {
-
-                junit '**/test-*.xml'
+                script {
+                    // Публікація результатів тестування у Jenkins
+                    junit '**/test-*.xml'
+                }
             }
         }
     }
 
     post {
         always {
-            // Надсилання електронної пошти з результатами тестування
-            emailext (
-                to: 'InsertYour@Mail.Here',
-                subject: "Jenkins Build ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
-                body: "Результати тестування:\n\n${currentBuild.fullDisplayName}\n\n${currentBuild.currentResult}",
-                attachLog: true
-            )
+            // Надсилання електронних листів з результатами тестування
+            mail to: 'InsertYour@Mail.Here',
+                 subject: "Jenkins Build ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
+                 body: "Build URL: ${env.BUILD_URL}\n\n${currentBuild.fullDisplayName}\n\n${currentBuild.currentResult}"
         }
     }
 }
