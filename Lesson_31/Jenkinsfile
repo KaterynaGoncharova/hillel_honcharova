@@ -2,14 +2,13 @@ pipeline {
     agent any
 
     environment {
-        // Встановлюємо шлях до файлу requirements.txt
-        REQUIREMENTS_PATH = 'Lesson_31/requirements.txt'
+        REQUIREMENTS_PATH = '/Users/katerynagoncharova/Hillel_course/pythonProject/hillel_honcharova/Lesson_31/requirements.txt'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Крок для вилучення коду з репозиторію
+                // Checkout code from the GitHub repository
                 git 'https://github.com/KaterynaGoncharova/hillel_honcharova'
             }
         }
@@ -17,9 +16,9 @@ pipeline {
         stage('Set up Python environment') {
             steps {
                 script {
-                    // Створення віртуального середовища
+                    // Create a virtual environment
                     sh 'python3 -m venv venv'
-                    // Встановлення залежностей з файлу requirements.txt
+                    // Install dependencies from the correct requirements.txt file
                     sh './venv/bin/pip install -r ${REQUIREMENTS_PATH}'
                 }
             }
@@ -28,7 +27,7 @@ pipeline {
         stage('Run tests') {
             steps {
                 script {
-                    // Запуск автотестів
+                    // Run the tests using pytest
                     sh './venv/bin/pytest'
                 }
             }
@@ -37,7 +36,7 @@ pipeline {
         stage('Publish test results') {
             steps {
                 script {
-                    // Публікація результатів тестування у Jenkins
+                    // Publish the test results to Jenkins
                     junit '**/test-*.xml'
                 }
             }
@@ -46,7 +45,7 @@ pipeline {
 
     post {
         always {
-            // Надсилання електронних листів з результатами тестування
+            // Ensure email settings are configured correctly in Jenkins
             mail to: 'InsertYour@Mail.Here',
                  subject: "Jenkins Build ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
                  body: "Build URL: ${env.BUILD_URL}\n\n${currentBuild.fullDisplayName}\n\n${currentBuild.currentResult}"
