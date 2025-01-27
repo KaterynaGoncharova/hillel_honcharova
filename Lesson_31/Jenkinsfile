@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    environment {
+        REQUIREMENTS_PATH = '/Users/katerynagoncharova/Hillel_course/pythonProject/hillel_honcharova/Lesson_31/requirements.txt'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from the GitHub repository
+                git 'https://github.com/KaterynaGoncharova/hillel_honcharova'
+            }
+        }
+
+        stage('Set up Python environment') {
+            steps {
+                script {
+                    // Create a virtual environment
+                    sh 'python3 -m venv venv'
+                    // Install dependencies from the correct requirements.txt file
+                    sh './venv/bin/pip install -r ${REQUIREMENTS_PATH}'
+                }
+            }
+        }
+
+        stage('Run tests') {
+            steps {
+                script {
+                    // Run the tests using pytest
+                    sh './venv/bin/pytest'
+                }
+            }
+        }
+
+        stage('Publish test results') {
+            steps {
+                script {
+                    // Publish the test results to Jenkins
+                    junit '**/test-*.xml'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Ensure email settings are configured correctly in Jenkins
+            mail to: 'InsertYour@Mail.Here',
+                 subject: "Jenkins Build ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
+                 body: "Build URL: ${env.BUILD_URL}\n\n${currentBuild.fullDisplayName}\n\n${currentBuild.currentResult}"
+        }
+    }
+}
