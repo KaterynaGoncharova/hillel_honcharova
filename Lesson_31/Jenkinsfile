@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        PYTHON_HOME = '/path/to/your/python/environment'
+        PATH = "${PYTHON_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh 'pip install -r requirements.txt'
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh 'pytest --maxfail=1 --disable-warnings -q'
+                }
+            }
+        }
+
+        stage('Publish Test Results') {
+            steps {
+                junit '**/test-*.xml'
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Надсилання електронного листа з результатами тестування
+                emailext(
+                    to: 'InsertYour@Mail.Here',
+                    subject: "Jenkins Build ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
+                    body: "Результати тестування доступні за посиланням: ${BUILD_URL}",
+                    attachLog: true
+                )
+            }
+        }
+    }
+}
