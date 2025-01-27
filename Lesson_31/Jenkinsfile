@@ -19,7 +19,7 @@ pipeline {
                     // Create a virtual environment
                     sh 'python3 -m venv venv'
                     // Install dependencies from the correct requirements.txt file
-                    sh './venv/bin/pip install -r ${REQUIREMENTS_PATH}'
+                    sh "./venv/bin/pip install -r ${REQUIREMENTS_PATH}"
                 }
             }
         }
