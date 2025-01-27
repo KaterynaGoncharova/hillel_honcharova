@@ -2,35 +2,43 @@ pipeline {
     agent any
 
     environment {
-        PYTHON_HOME = '/path/to/your/python/environment'
-        PATH = "${PYTHON_HOME}/bin:${env.PATH}"
+        // Встановіть шлях до вашого Python середовища або використовуйте системний Python
+        PYTHON_HOME = '/path/to/your/python'
     }
 
     stages {
         stage('Checkout') {
             steps {
+                // Вилучення коду з репозиторію
                 checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                // Встановлення залежностей
                 script {
-                    sh 'pip install -r requirements.txt'
+                    sh '''
+                        ${PYTHON_HOME}/bin/pip install -r requirements.txt
+                    '''
                 }
             }
         }
 
         stage('Run Tests') {
             steps {
+                // Запуск автотестів
                 script {
-                    sh 'pytest --maxfail=1 --disable-warnings -q'
+                    sh '''
+                        ${PYTHON_HOME}/bin/python -m unittest discover
+                    '''
                 }
             }
         }
 
         stage('Publish Test Results') {
             steps {
+                // Публікація результатів тестування у Jenkins
                 junit '**/test-*.xml'
             }
         }
@@ -38,15 +46,13 @@ pipeline {
 
     post {
         always {
-            script {
-                // Надсилання електронного листа з результатами тестування
-                emailext(
-                    to: 'InsertYour@Mail.Here',
-                    subject: "Jenkins Build ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
-                    body: "Результати тестування доступні за посиланням: ${BUILD_URL}",
-                    attachLog: true
-                )
-            }
+            // Надсилання електронної пошти з результатами тестування
+            emailext (
+                to: 'InsertYour@Mail.Here',
+                subject: "Jenkins Build ${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
+                body: "Результати тестування:\n\n${currentBuild.fullDisplayName}\n\n${currentBuild.currentResult}",
+                attachLog: true
+            )
         }
     }
 }
